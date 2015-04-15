@@ -31,7 +31,7 @@ public:
 	virtual const uint8_t *get(enum operation op) const = 0;
 };
 
-class arch_x86 : public architecture {
+class x86_64 : public architecture {
 public:
 	virtual const uint8_t *get(enum operation op) const;
 };
