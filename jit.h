@@ -24,21 +24,17 @@ public:
 		SYSCALL,
 		RET,
 		MOV_SI_AX,
-		MOV_AS_LIT64
+		MOV_AS_LIT64,
+		OP_MAX, // maximum operation number
 	};
 
 	virtual ~architecture() {}
 	virtual const uint8_t *get(enum operation op) const = 0;
 };
 
-class x86_64 : public architecture {
-public:
-	virtual const uint8_t *get(enum operation op) const;
-};
-
 class jit {
 public:
-	jit(size_t mem_pages = 1, size_t exec_pages = 1);
+	jit(architecture *arch, size_t mem_pages = 1, size_t exec_pages = 1);
 	~jit();
 
 	// give jit tokens
@@ -47,6 +43,8 @@ public:
 	// void run();
 
 private:
+	architecture *arch;
+
 	size_t init_pos = 0,
 		exec_pos = 0,
 		exec_pages, mem_pages;

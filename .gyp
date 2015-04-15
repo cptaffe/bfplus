@@ -16,7 +16,8 @@
 			'dependencies': [],
 			'sources': [
 				'comp.cc',
-				'jit.cc'
+				'jit.cc',
+				'x86_64.cc',
 			],
 			'include_dirs': [],
 		},

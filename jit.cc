@@ -7,9 +7,10 @@
 
 using namespace bf;
 
-jit::jit(size_t mem_pages, size_t exec_pages) :
+jit::jit(architecture *arch, size_t mem_pages, size_t exec_pages) :
 	// mmap pages with PROT_WRITE or PROT_EXEC at once to allow
 	// for w^x compatibility.
+	arch(arch),
 	mem_pages(mem_pages),
 	exec_pages(exec_pages),
 	mem((uint8_t *) mmap(NULL,
