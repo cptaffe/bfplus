@@ -10,12 +10,10 @@
 
 using namespace bf;
 
-comp::comp(std::istream *is) /*: l(is)*/ {}
+comp::comp(std::istream *is) : j(static_cast<architecture *>(new x86_64())) {}
 
 void comp::run() {
 	std::vector<std::future<bool>> futures;
-	x86_64 arch;
-	jit j((architecture *) &arch);
 
 	futures.push_back(std::async(&jit::runnable, &j));
 

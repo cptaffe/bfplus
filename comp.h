@@ -2,6 +2,8 @@
 #ifndef BF_COMP_H_
 #define BF_COMP_H_
 
+#include "jit.h"
+
 #include <istream>
 
 namespace bf {
@@ -13,7 +15,7 @@ public:
 	void run();
 private:
 	//lex l;
-	//jit j;
+	jit j;
 };
 
 } // namespace bf
