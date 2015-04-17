@@ -19,6 +19,7 @@
 				'jit.cc',
 				'lex.cc',
 				'x86_64.cc',
+				'log.cc',
 			],
 			'include_dirs': [],
 		},

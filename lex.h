@@ -4,6 +4,7 @@
 
 #include <istream>
 #include <string>
+#include <mutex>
 
 namespace bf {
 
@@ -15,8 +16,8 @@ public:
 	void back(); // back's one character
 	int peek(); // peeks ahead
 
-	// returns non-freeable, immutable pointer.
-	const std::string *grab() const;
+	// returns an allocated string copy of the internal string.
+	std::string *grab();
 	// returns an allocated string copy of the internal string.
 	// and clears the internal string.
 	std::string *emit();
@@ -24,6 +25,7 @@ private:
 	std::istream *in;
 	std::string backbuf;
 	std::string buf;
+	std::mutex m;
 };
 
 } // namespace bf
