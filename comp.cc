@@ -10,16 +10,24 @@
 
 using namespace bf;
 
-comp::comp(std::istream *is) : j(static_cast<architecture *>(new x86_64())) {}
+namespace {
+	char test(lex *l) {
+		return l->peek();
+	}
+}
+
+comp::comp(std::istream *is) :
+	j(static_cast<architecture *>(new x86_64())),
+	l(is) {}
 
 void comp::run() {
-	std::vector<std::future<bool>> futures;
+	std::vector<std::future<char>> futures;
 
-	futures.push_back(std::async(&jit::runnable, &j));
+	futures.push_back(std::async(&test, &l));
 
 	// wait for result.
 	auto i = futures.back().get();
 	futures.pop_back();
 
-	std::cout << "have: " << i << std::endl;
+	std::cout << "have: '" << i << "'" << std::endl;
 }

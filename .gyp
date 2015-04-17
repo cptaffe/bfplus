@@ -17,6 +17,7 @@
 			'sources': [
 				'comp.cc',
 				'jit.cc',
+				'lex.cc',
 				'x86_64.cc',
 			],
 			'include_dirs': [],

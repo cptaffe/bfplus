@@ -3,6 +3,7 @@
 #define BF_COMP_H_
 
 #include "jit.h"
+#include "lex.h"
 
 #include <istream>
 
@@ -14,7 +15,7 @@ public:
 
 	void run();
 private:
-	//lex l;
+	lex l;
 	jit j;
 };
 
