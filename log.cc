@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-namespace bf { log logerr(std::cerr); }
+namespace bf { log err(std::cerr); }
 
 using namespace bf;
 

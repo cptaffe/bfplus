@@ -7,6 +7,7 @@
 #include <mutex>
 #include <string>
 #include <future>
+#include <iostream>
 
 namespace bf {
 
@@ -22,8 +23,8 @@ private:
 	std::future<void> printer;
 };
 
-// global log
-extern log logerr;
+// extern error log
+extern log err;
 
 } // namespace bf
 

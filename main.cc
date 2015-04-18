@@ -20,7 +20,7 @@ test::test() :
 	c(in) {
 	std::string msg("I am here");
 	auto j = c.run();
-	bf::logerr.println(msg);
+	bf::err.println(msg);
 	j.wait();
 }
 

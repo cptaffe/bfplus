@@ -43,16 +43,9 @@ std::future<void> comp::run() {
 			str.push_back(j);
 			str.append("'");
 
-			logerr.println(str);
+			err.println(str);
 		}
 		delete futures;
-
-		// creepy message thing.
-		/*std::string str("Hello, want to play a game?\n");
-		for (auto i = str.begin(); i != str.end(); i++) {
-			std::cout << *i << std::flush;
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		}*/
 	}, futures);
 
 	return next;
