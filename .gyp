@@ -3,10 +3,14 @@
 		'xcode_settings': {
 			'OTHER_CFLAGS': [
 				'--std=c++11',
+				'-g',
+				'-static',
 			],
 		},
 		'cflags': [
 			'--std=c++11',
+			'-g',
+			'-static',
 		],
 	},
 	'targets': [

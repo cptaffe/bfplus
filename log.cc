@@ -3,12 +3,14 @@
 
 #include <iostream>
 
-namespace bf { log logger; }
+namespace bf { log logerr(std::cerr); }
 
 using namespace bf;
 
-log::log() :
+log::log(std::ostream& os) :
+	os(os),
 	printer(std::async([this]{
+		// asyncronous printing of log messages.
 		std::pair<bool, std::function<void()>> p;
 		while((p = lambdas.get()).first) {
 			p.second();
@@ -23,7 +25,7 @@ log::~log() {
 void log::println(std::string& str) {
 	if (lambdas.alive()) {
 		lambdas.put([this, str] {
-			std::cerr << str << std::endl;
+			os << str << std::endl;
 		});
 	} else {
 		throw new std::runtime_error("logging to dead logger.");

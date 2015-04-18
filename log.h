@@ -12,17 +12,18 @@ namespace bf {
 
 class log {
 public:
-	log();
+	log(std::ostream& os);
 	~log();
 	void println(std::string& str);
 	void wait();
 private:
+	std::ostream& os;
 	channel<std::function<void()>> lambdas;
 	std::future<void> printer;
 };
 
 // global log
-extern log logger;
+extern log logerr;
 
 } // namespace bf
 

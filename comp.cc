@@ -17,8 +17,13 @@ namespace {
 }
 
 comp::comp(std::istream *is) :
-	j(static_cast<architecture *>(new x86_64())),
+	arch(static_cast<architecture *>(new x86_64())),
+	j(arch),
 	l(is) {}
+
+comp::~comp() {
+	delete arch;
+}
 
 std::future<void> comp::run() {
 	std::vector<std::future<char>> *futures = new std::vector<std::future<char>>();
@@ -38,7 +43,7 @@ std::future<void> comp::run() {
 			str.push_back(j);
 			str.append("'");
 
-			logger.println(str);
+			logerr.println(str);
 		}
 		delete futures;
 

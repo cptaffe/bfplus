@@ -13,10 +13,12 @@ namespace bf {
 class comp {
 public:
 	comp(std::istream *is);
+	~comp();
 
 	std::future<void> run();
 private:
 	lex l;
+	architecture *arch;
 	jit j;
 };
 

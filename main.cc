@@ -16,11 +16,11 @@ private:
 };
 
 test::test() :
-	in(static_cast<std::istream *>(new std::istringstream("this is a string"))),
+	in(static_cast<std::istringstream *>(new std::istringstream("this is a string"))),
 	c(in) {
 	std::string msg("I am here");
 	auto j = c.run();
-	bf::logger.println(msg);
+	bf::logerr.println(msg);
 	j.wait();
 }
 
