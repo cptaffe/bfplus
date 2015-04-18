@@ -18,9 +18,8 @@ private:
 test::test() :
 	in(static_cast<std::istringstream *>(new std::istringstream("this is a string"))),
 	c(in) {
-	std::string msg("I am here");
 	auto j = c.run();
-	bf::err.println(msg);
+	bf::err << "I am here";
 	j.wait();
 }
 
