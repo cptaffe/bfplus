@@ -2,23 +2,23 @@
 #ifndef BF_LOG_H_
 #define BF_LOG_H_
 
+#include "channel.h"
+
 #include <mutex>
 #include <string>
-#include <list>
 #include <future>
 
 namespace bf {
 
 class log {
 public:
+	log();
 	~log();
 	void println(std::string& str);
 	void wait();
-	void clean();
 private:
-	std::list<std::future<void>> prints;
-	std::mutex mclean;
-	std::mutex mut;
+	channel<std::function<void()>> lambdas;
+	std::future<void> printer;
 };
 
 // global log

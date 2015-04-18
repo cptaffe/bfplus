@@ -1,0 +1,60 @@
+
+#ifndef BF_CHANNEL_H_
+#define BF_CHANNEL_H_
+
+#include <mutex>
+#include <condition_variable>
+#include <queue>
+#include <atomic>
+#include <utility> // std::pair
+#include <iostream>
+
+namespace bf {
+
+template <typename t>
+class channel {
+public:
+	channel() : alive_(true) {}
+
+	std::pair<bool, t> get() {
+		std::unique_lock<std::mutex> lock(mut);
+		while (queue.empty() && alive()) {
+			cond.wait(lock);
+		}
+		if (queue.empty()) {
+			return std::make_pair(false, static_cast<t>(0));
+		}
+		auto p = std::make_pair(true, queue.front());
+		queue.pop();
+		return p;
+	}
+
+	void put(const t& item) {
+		std::unique_lock<std::mutex> lock(mut);
+		queue.push(item);
+		lock.unlock();
+		cond.notify_one();
+	}
+
+	bool empty() const {
+		std::lock_guard<std::mutex> lock(mut);
+		return queue.empty();
+	}
+
+	bool alive() const {
+		return alive_;
+	}
+
+	void kill() {
+		alive_ = (bool) false;
+	}
+private:
+	mutable std::mutex mut;
+	std::condition_variable cond;
+	std::queue<t> queue;
+	std::atomic<bool> alive_;
+};
+
+} // namespace bf
+
+#endif // BF_CHANNEL_H_
