@@ -70,8 +70,10 @@ bool state_machine::run() {
 
 lexer::lexer(std::istream *str) :
 	scan(str),
+	chan_(5),
 	mach(new start(&scan, &chan_)),
 	thrd(std::async([this]{
+		err << "lexer async running";
 		bool m = mach.run();
 		chan_.kill();
 		return m;

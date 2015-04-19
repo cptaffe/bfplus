@@ -13,7 +13,9 @@ using namespace bf;
 comp::comp(std::istream *is) :
 	arch(static_cast<architecture *>(new x86_64())),
 	j(arch),
-	l(is) {}
+	l(is) {
+		err << "comp constructing";
+	}
 
 comp::~comp() {
 	delete arch;
@@ -21,6 +23,6 @@ comp::~comp() {
 
 std::future<void> comp::run() {
 	return std::async([]{
-		// nothing.
+		err << "comp asynchronous run running.";
 	});
 }

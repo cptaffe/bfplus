@@ -17,38 +17,44 @@ class put_channel;
 template <typename t>
 class channel {
 public:
-	channel() : alive_(true) {}
+	channel(uint64_t max) : alive_(true), max_count(max), count_(0) {}
 
-	std::pair<bool, t> get() {
+	void get(t *item) {
+		// aquire mutex & wait for empty.
 		std::unique_lock<std::mutex> lock(mut);
-		while (queue.empty() && alive()) {
-			cond.wait(lock);
+		while (count_ == 0 && alive_) {
+			empty.wait(lock);
 		}
-		if (queue.empty()) {
-			// FIXME: this line causes death and destruction (most likely)
-			// the second type of the pair must never be touched when
-			// the first is false (as in failure).
-			// static_cast-ing some junk data (nullptr) seems to work
-			// for avoiding compile errors/warnings, but I'm not sure
-			// if it absorbs surrounding memory or does other schetchy
-			// operations.
-			return std::make_pair(false, static_cast<t>(nullptr));
+
+		if (!alive_ && queue.empty()) {
+			item = nullptr;
+			return;
 		}
-		auto p = std::make_pair(true, queue.front());
+
+		*item = queue.front();
 		queue.pop();
-		return p;
+		--count_;
+
+		lock.unlock();
+		full.notify_one();
 	}
 
 	void put(const t& item) {
+		// aquire mutex & wait for empty.
 		std::unique_lock<std::mutex> lock(mut);
-		queue.push(item);
-		lock.unlock();
-		cond.notify_one();
-	}
+		while (count_ == max_count && alive_) {
+			full.wait(lock);
+		}
 
-	bool empty() const {
-		std::lock_guard<std::mutex> lock(mut);
-		return queue.empty();
+		if (!alive_) {
+			return;
+		}
+
+		queue.push(item);
+
+		++count_;
+		lock.unlock();
+		empty.notify_one();
 	}
 
 	bool alive() const {
@@ -57,12 +63,23 @@ public:
 
 	void kill() {
 		alive_ = false;
+		// wake up all waiting because death.
+		full.notify_all();
+		empty.notify_all();
 	}
 private:
-	mutable std::mutex mut;
-	std::condition_variable cond;
+	std::mutex mut;
 	std::queue<t> queue;
+
+	// dead queue.
 	std::atomic<bool> alive_;
+
+	// atomic access full/empty
+	const uint64_t max_count;
+	std::atomic<uint64_t> count_;
+
+	std::condition_variable full;
+	std::condition_variable empty;
 };
 
 } // namespace bf
