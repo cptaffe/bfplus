@@ -17,7 +17,7 @@ public:
 
 	std::future<void> run();
 private:
-	lex l;
+	lexer l;
 	architecture *arch;
 	jit j;
 };

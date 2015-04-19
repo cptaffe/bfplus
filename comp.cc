@@ -21,6 +21,6 @@ comp::~comp() {
 
 std::future<void> comp::run() {
 	return std::async([]{
-		err << "hello, bob";
+		// nothing.
 	});
 }

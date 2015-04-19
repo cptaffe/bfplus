@@ -24,6 +24,7 @@
 				'lex.cc',
 				'x86_64.cc',
 				'log.cc',
+				'tok.cc',
 			],
 			'include_dirs': [],
 		},

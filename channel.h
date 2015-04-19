@@ -11,6 +11,9 @@
 
 namespace bf {
 
+class get_channel;
+class put_channel;
+
 template <typename t>
 class channel {
 public:
@@ -53,7 +56,7 @@ public:
 	}
 
 	void kill() {
-		alive_ = (bool) false;
+		alive_ = false;
 	}
 private:
 	mutable std::mutex mut;

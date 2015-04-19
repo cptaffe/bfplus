@@ -15,7 +15,7 @@ class log {
 public:
 	log(std::ostream& os);
 	~log();
-	void operator<<(std::string str);
+	void operator<<(const std::string& str);
 	void wait();
 private:
 	std::ostream& os;

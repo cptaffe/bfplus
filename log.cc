@@ -22,7 +22,7 @@ log::~log() {
 	wait(); // finish prints.
 }
 
-void log::operator<<(std::string str) {
+void log::operator<<(const std::string& str) {
 	if (lambdas.alive()) {
 		lambdas.put([this, str] {
 			os << str << std::endl;

@@ -19,7 +19,6 @@ test::test() :
 	in(static_cast<std::istringstream *>(new std::istringstream("this is a string"))),
 	c(in) {
 	auto j = c.run();
-	bf::err << "I am here";
 	j.wait();
 }
 
