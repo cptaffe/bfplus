@@ -15,7 +15,8 @@ comp::comp(std::istream *is) :
 	run_(std::async([this]{
 		tok *t;
 		while (chan_.get(&t)) {
-			err << *(t->token()->second);
+			std::string str(*t->token()->second);
+			err << str;
 			delete t;
 		}
 	})) {
