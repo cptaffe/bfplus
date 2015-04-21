@@ -65,12 +65,10 @@ private:
 
 class lexer {
 public:
-	explicit lexer(std::istream *str);
-	~lexer();
-	channel<tok *> *chan();
+	lexer(std::istream *str, channel<tok *> *chan);
 private:
 	scanner scan;
-	channel<tok *> chan_;
+	channel<tok *> *chan_;
 	state_machine mach;
 	std::future<bool> thrd;
 };
@@ -78,6 +76,66 @@ private:
 class start : public state {
 public:
 	start(scanner *scan, channel<tok *> *chan);
+	virtual bool try_apply();
+private:
+	static const int current_ = START; // current state.
+	scanner *scan_;
+	channel<tok *> *chan_;
+};
+
+class whitespace : public state {
+public:
+	whitespace(scanner *scan, channel<tok *> *chan);
+	virtual bool try_apply();
+private:
+	static const int current_ = START; // current state.
+	scanner *scan_;
+	channel<tok *> *chan_;
+};
+
+class cross : public state {
+public:
+	cross(scanner *scan, channel<tok *> *chan);
+	virtual bool try_apply();
+private:
+	static const int current_ = START; // current state.
+	scanner *scan_;
+	channel<tok *> *chan_;
+};
+
+class dash : public state {
+public:
+	dash(scanner *scan, channel<tok *> *chan);
+	virtual bool try_apply();
+private:
+	static const int current_ = START; // current state.
+	scanner *scan_;
+	channel<tok *> *chan_;
+};
+
+class forward : public state {
+public:
+	forward(scanner *scan, channel<tok *> *chan);
+	virtual bool try_apply();
+private:
+	static const int current_ = START; // current state.
+	scanner *scan_;
+	channel<tok *> *chan_;
+};
+
+class back : public state {
+public:
+	back(scanner *scan, channel<tok *> *chan);
+	virtual bool try_apply();
+private:
+	static const int current_ = START; // current state.
+	scanner *scan_;
+	channel<tok *> *chan_;
+};
+
+class loop : public state {
+public:
+	loop(scanner *scan, channel<tok *> *chan);
 	virtual bool try_apply();
 private:
 	static const int current_ = START; // current state.

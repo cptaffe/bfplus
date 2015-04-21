@@ -19,7 +19,7 @@ class channel {
 public:
 	channel(uint64_t max) : alive_(true), max_count(max), count_(0) {}
 
-	void get(t *item) {
+	bool get(t *item) {
 		// aquire mutex & wait for empty.
 		std::unique_lock<std::mutex> lock(mut);
 		while (count_ == 0 && alive_) {
@@ -27,8 +27,7 @@ public:
 		}
 
 		if (!alive_ && queue.empty()) {
-			item = nullptr;
-			return;
+			return false;
 		}
 
 		*item = queue.front();
@@ -37,6 +36,7 @@ public:
 
 		lock.unlock();
 		full.notify_one();
+		return true;
 	}
 
 	void put(const t& item) {

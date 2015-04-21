@@ -1,28 +1,23 @@
 
 #include "comp.h"
 #include "log.h"
+#include "jit.h"
 
 #include <vector>
 #include <iostream>
 
-#include "jit.h"
-#include "x86_64.h"
-
 using namespace bf;
 
 comp::comp(std::istream *is) :
-	arch(static_cast<architecture *>(new x86_64())),
-	j(arch),
-	l(is) {
-		err << "comp constructing";
-	}
-
-comp::~comp() {
-	delete arch;
-}
-
-std::future<void> comp::run() {
-	return std::async([]{
-		err << "comp asynchronous run running.";
-	});
+	chan_(5),
+	j(static_cast<architecture *>(&arch)),
+	l(is, &chan_),
+	run_(std::async([this]{
+		tok *t;
+		while (chan_.get(&t)) {
+			err << *(t->token()->second);
+			delete t;
+		}
+	})) {
+	err << "comp constructing";
 }

@@ -19,10 +19,11 @@ public:
 		END_LOOP,   // ]
 	} token_type;
 
-	tok(token_type t, std::string msg);
-	const std::pair<token_type, std::string> *token() const;
+	tok(token_type t, std::string *msg);
+	~tok();
+	const std::pair<token_type, std::string *> *token() const;
 private:
-	std::pair<token_type, std::string> token_;
+	std::pair<token_type, std::string *> token_;
 };
 
 } // namespace bf

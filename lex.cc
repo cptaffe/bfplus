@@ -68,30 +68,48 @@ bool state_machine::run() {
 	return false; // error
 }
 
-lexer::lexer(std::istream *str) :
+lexer::lexer(std::istream *str, channel<tok *> *chan) :
+	chan_(chan),
 	scan(str),
-	chan_(5),
-	mach(new start(&scan, &chan_)),
+	mach(new start(&scan, chan_)),
 	thrd(std::async([this]{
-		err << "lexer async running";
 		bool m = mach.run();
-		chan_.kill();
+		chan_->kill();
+		err << "channel killed, returning";
 		return m;
 	})) {}
 
-lexer::~lexer() {
-	thrd.wait();
-}
-
-channel<tok *> *lexer::chan() {
-	return &chan_;
-}
-
 namespace {
-	bool whitespace_char(char c) {
-		std::string ws(" \t\r\n");
-		return ws.find(c) != std::string::npos;
-	}
+
+bool is_whitespace(char c) {
+	std::string ws(" \t\r\n");
+	return ws.find(c) != std::string::npos;
+}
+
+bool is_cross(char c) {
+	return c == '+';
+}
+
+bool is_dash(char c) {
+	return c == '-';
+}
+
+bool is_forward(char c) {
+	return c == '>';
+}
+
+bool is_back(char c) {
+	return c == '<';
+}
+
+bool is_loop_begin(char c) {
+	return c == '[';
+}
+
+bool is_loop_end(char c) {
+	return c == ']';
+}
+
 } // namespace
 
 start::start(scanner *scan, channel<tok *> *chan) :
@@ -100,15 +118,144 @@ start::start(scanner *scan, channel<tok *> *chan) :
 
 bool start::try_apply() {
 	int c;
-	if ((c = scan_->next()) != EOF) {
-		if (whitespace_char(c)) {
-			next_ = nullptr; // still unimplemented.
-			return true;
+	if ((c = scan_->peek()) != EOF) {
+		if (is_whitespace(c)) {
+			next_ = new whitespace(scan_, chan_);
+		} else if (is_cross(c)) {
+			next_ = new cross(scan_, chan_);
+		} else if (is_dash(c)) {
+			next_ = new dash(scan_, chan_);
+		} else if (is_forward(c)) {
+			next_ = new forward(scan_, chan_);
+		} else if (is_back(c)) {
+			next_ = new back(scan_, chan_);
+		} else if (is_loop_begin(c)) {
+			next_ = new loop(scan_, chan_);
+		} else if (is_loop_end(c)) {
+			err << "loop ended";
+			return false;
 		} else {
-			return true;
+			return false; // invalid character.
 		}
+		return true;
 	} else {
 		// eof's are acceptable in the start state.
 		return true;
 	}
+}
+
+whitespace::whitespace(scanner *scan, channel<tok *> *chan) :
+	scan_(scan),
+	chan_(chan) {
+	next_ = new start(scan_, chan_);
+}
+
+bool whitespace::try_apply() {
+	err << "lexing whitespace";
+	int c;
+	while ((c = scan_->next()) != EOF && is_whitespace(c)) {}
+	if (c != EOF) {
+		scan_->back();
+	}
+	// throw away whitespace
+	delete scan_->emit();
+	return true;
+}
+
+cross::cross(scanner *scan, channel<tok *> *chan) :
+	scan_(scan),
+	chan_(chan) {
+	next_ = new start(scan_, chan_);
+}
+
+bool cross::try_apply() {
+	err << "lexing cross";
+	int c;
+	while ((c = scan_->next()) != EOF && is_cross(c)) {}
+	if (c != EOF) {
+		scan_->back();
+	}
+	// throw away whitespace
+	chan_->put(new tok(tok::CROSS, scan_->emit()));
+	return true;
+}
+
+dash::dash(scanner *scan, channel<tok *> *chan) :
+	scan_(scan),
+	chan_(chan) {
+	next_ = new start(scan_, chan_);
+}
+
+bool dash::try_apply() {
+	err << "lexing dash";
+	int c;
+	while ((c = scan_->next()) != EOF && is_dash(c)) {}
+	if (c != EOF) {
+		scan_->back();
+	}
+	// throw away whitespace
+	chan_->put(new tok(tok::DASH, scan_->emit()));
+	return true;
+}
+
+forward::forward(scanner *scan, channel<tok *> *chan) :
+	scan_(scan),
+	chan_(chan) {
+	next_ = new start(scan_, chan_);
+}
+
+bool forward::try_apply() {
+	err << "lexing forward";
+	int c;
+	while ((c = scan_->next()) != EOF && is_forward(c)) {}
+	if (c != EOF) {
+		scan_->back();
+	}
+	// throw away whitespace
+	chan_->put(new tok(tok::DASH, scan_->emit()));
+	return true;
+}
+
+back::back(scanner *scan, channel<tok *> *chan) :
+	scan_(scan),
+	chan_(chan) {
+	next_ = new start(scan_, chan_);
+}
+
+bool back::try_apply() {
+	err << "lexing back";
+	int c;
+	while ((c = scan_->next()) != EOF && is_back(c)) {}
+	if (c != EOF) {
+		// whitespace can end on eof.
+		scan_->back();
+	}
+	// throw away whitespace
+	chan_->put(new tok(tok::BACK, scan_->emit()));
+	return true;
+}
+
+loop::loop(scanner *scan, channel<tok *> *chan) :
+	scan_(scan),
+	chan_(chan) {
+	next_ = new start(scan_, chan_);
+}
+
+bool loop::try_apply() {
+	int c;
+	if ((c = scan_->next()) != EOF && is_loop_begin(c)) {
+		chan_->put(new tok(tok::BEGIN_LOOP, scan_->emit()));
+
+		state_machine mach(new start(scan_, chan_));
+		if (!mach.run() && is_loop_end(scan_->next())) {
+			// loop has correctly ended
+			chan_->put(new tok(tok::END_LOOP, scan_->emit()));
+			return true;
+		} else {
+			return false; // failure.
+		}
+	} else {
+		return false;
+	}
+	return true;
 }

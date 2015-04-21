@@ -16,7 +16,6 @@ public:
 	log(std::ostream& os);
 	~log();
 	void operator<<(const std::string& str);
-	void wait();
 private:
 	std::ostream& os;
 	channel<std::function<void()>> lambdas;

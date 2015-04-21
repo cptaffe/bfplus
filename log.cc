@@ -12,21 +12,15 @@ log::log(std::ostream& os) :
 	os(os),
 	printer(std::async([this]{
 		// asyncronous printing of log messages.
-		while (true) {
-			std::function<void()> f;
-			lambdas.get(&f);
-			if (f) {
-				f();
-			} else {
-				// queue is empty, die.
-				break;
-			}
+		std::function<void()> f;
+		while (lambdas.get(&f)) {
+			f();
 		}
 	})) {}
 
 log::~log() {
+	// kills channel, signalling death.
 	lambdas.kill();
-	wait(); // finish prints.
 }
 
 void log::operator<<(const std::string& str) {
@@ -34,8 +28,4 @@ void log::operator<<(const std::string& str) {
 	lambdas.put([this, str] {
 		os << str << std::endl;
 	});
-}
-
-void log::wait() {
-	printer.wait();
 }

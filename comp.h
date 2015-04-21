@@ -4,6 +4,7 @@
 
 #include "jit.h"
 #include "lex.h"
+#include "x86_64.h"
 
 #include <istream>
 #include <future>
@@ -13,13 +14,12 @@ namespace bf {
 class comp {
 public:
 	comp(std::istream *is);
-	~comp();
-
-	std::future<void> run();
 private:
+	channel<tok *> chan_;
 	lexer l;
-	architecture *arch;
+	x86_64 arch;
 	jit j;
+	std::future<void> run_;
 };
 
 } // namespace bf
