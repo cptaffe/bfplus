@@ -19,5 +19,4 @@ comp::comp(std::istream *is) :
 			delete t;
 		}
 	})) {
-	err << "comp constructing";
 }

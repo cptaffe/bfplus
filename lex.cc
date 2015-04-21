@@ -75,7 +75,6 @@ lexer::lexer(std::istream *str, channel<tok *> *chan) :
 	thrd(std::async([this]{
 		bool m = mach.run();
 		chan_->kill();
-		err << "channel killed, returning";
 		return m;
 	})) {}
 
@@ -132,7 +131,6 @@ bool start::try_apply() {
 		} else if (is_loop_begin(c)) {
 			next_ = new loop(scan_, chan_);
 		} else if (is_loop_end(c)) {
-			err << "loop ended";
 			return false;
 		} else {
 			return false; // invalid character.
@@ -151,7 +149,6 @@ whitespace::whitespace(scanner *scan, channel<tok *> *chan) :
 }
 
 bool whitespace::try_apply() {
-	err << "lexing whitespace";
 	int c;
 	while ((c = scan_->next()) != EOF && is_whitespace(c)) {}
 	if (c != EOF) {
@@ -169,7 +166,6 @@ cross::cross(scanner *scan, channel<tok *> *chan) :
 }
 
 bool cross::try_apply() {
-	err << "lexing cross";
 	int c;
 	while ((c = scan_->next()) != EOF && is_cross(c)) {}
 	if (c != EOF) {
@@ -187,7 +183,6 @@ dash::dash(scanner *scan, channel<tok *> *chan) :
 }
 
 bool dash::try_apply() {
-	err << "lexing dash";
 	int c;
 	while ((c = scan_->next()) != EOF && is_dash(c)) {}
 	if (c != EOF) {
@@ -205,7 +200,6 @@ forward::forward(scanner *scan, channel<tok *> *chan) :
 }
 
 bool forward::try_apply() {
-	err << "lexing forward";
 	int c;
 	while ((c = scan_->next()) != EOF && is_forward(c)) {}
 	if (c != EOF) {
@@ -223,7 +217,6 @@ back::back(scanner *scan, channel<tok *> *chan) :
 }
 
 bool back::try_apply() {
-	err << "lexing back";
 	int c;
 	while ((c = scan_->next()) != EOF && is_back(c)) {}
 	if (c != EOF) {
