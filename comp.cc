@@ -2,6 +2,7 @@
 #include "comp.h"
 #include "log.h"
 #include "jit.h"
+#include "tree.h"
 
 #include <vector>
 #include <iostream>
@@ -14,6 +15,7 @@ comp::comp(std::istream *is) :
 	l(is, &chan_),
 	run_(std::async([this]{
 		tok *t;
+		tree tr;
 		while (chan_.get(&t)) {
 			std::string str(*t->token()->second);
 			err << str;
